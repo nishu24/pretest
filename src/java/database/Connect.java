@@ -19,7 +19,7 @@ public class Connect {
         Connection conn = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String jdbc = "jdbc:mysql://localhost/pretest";
+            String jdbc = "jdbc:mysql://localhost/student";
             String user = "root";
             String pass = "";
             conn = DriverManager.getConnection(jdbc, user, pass);

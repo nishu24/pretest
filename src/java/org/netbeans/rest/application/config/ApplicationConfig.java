@@ -13,7 +13,7 @@ import javax.ws.rs.core.Application;
  *
  * @author chintan
  */
-@javax.ws.rs.ApplicationPath("w")
+@javax.ws.rs.ApplicationPath("nishu")
 public class ApplicationConfig extends Application {
 
     @Override

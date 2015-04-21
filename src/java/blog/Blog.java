@@ -15,8 +15,12 @@ import java.util.logging.Logger;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import static javax.ws.rs.HttpMethod.PUT;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
@@ -48,11 +52,12 @@ public class Blog {
             JsonArrayBuilder array = Json.createArrayBuilder();
             while (results.next()) {
                 array.add(Json.createObjectBuilder()
-                        .add("blog_id", results.getString("blog_id"))
-                        .add("user_id", results.getString("user_id"))
-                        .add("blog_date_time", results.getString("blog_date_time"))
+                        .add("blogID", results.getString("blogID"))
+                        .add("userID", results.getString("userID"))
+                        .add("blogDateTime", results.getString("blogDateTime"))
                         .add("title", results.getString("title"))
                         .add("content", results.getString("content"))
+                        .add("tags", results.getString("tags"))
                 );
             }
             json = array.build();
@@ -60,5 +65,43 @@ public class Blog {
             Logger.getLogger(Connect.class.getName()).log(Level.SEVERE, null, ex);
         }
         return json;
+    }
+    @DELETE
+    @Path("{id}")
+    public Response deleteOne(@PathParam("id") String id) {
+        int result = doUpdate("delete from blog where blogID=?", id);
+        if (result <= 0) {
+            return Response.status(500).build();
+        } else {
+            return Response.noContent().build();
+        }
+
+    }
+//    @PUT
+//    @Path("{id}")
+//    public Response updateOne(@PathParam("id")String id,@PathParam("name")String name,@PathParam("description")String description,@PathParam("quantity")String quantity){
+//    
+//      int result = doUpdate("update product set name=?,description=?,quantity=? where productid=?", name,description,quantity,id);
+//        if (result <= 0) {
+//            return Response.status(500).build();
+//        } else {
+//            return Response.noContent().build();
+//        }
+//    }
+
+    private int doUpdate(String query, String... params) {
+        int numChanges = 0;
+        try (Connection con = Connect.getConnection()) {
+            PreparedStatement pstmt = con.prepareStatement(query);
+            for (int i = 1; i <= params.length; i++) {
+                pstmt.setString(i, params[i - 1]);
+            }
+            numChanges = pstmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Blog.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+        return numChanges;
     }
 }
